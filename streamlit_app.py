@@ -1,30 +1,12 @@
 import streamlit as st
 import pandas as pd
 import altair as alt
-import pycountry
+
 from vega_datasets import data
 
 # Load data from the URL
-url = 'https://raw.githubusercontent.com/xyzhang09/BMI706_Project/main/Life_Expectancy_Data.csv'
+url = 'https://raw.githubusercontent.com/xyzhang09/BMI706_Project/main/clean_Life_Expectancy_Data.csv'
 df = pd.read_csv(url)
-
-import subprocess
-subprocess.run(["pip", "install", "pycountry"])
-
-# Function to map country names to ISO numeric country codes
-def get_numeric_country_code(name):
-    try:
-        return pycountry.countries.lookup(name).numeric
-    except LookupError:
-        return None
-
-# Apply the function to map country names to ISO numeric country codes
-df['country-code'] = df['Country'].apply(get_numeric_country_code)
-
-# Check for countries that couldn't be matched
-missing_codes = df[df['country-code'].isna()]['Country'].unique()
-if len(missing_codes) > 0:
-    st.write("Countries that couldn't be matched with ISO numeric codes:", missing_codes)
 
 # Streamlit app title
 st.title("Life Expectancy Comparison Dashboard")
