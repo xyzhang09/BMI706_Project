@@ -1,12 +1,29 @@
 import streamlit as st
-import altair as alt
 import pandas as pd
+import altair as alt
+import pycountry
 from vega_datasets import data
 
-# Load your cleaned data (make sure the path is correct)
-df = pd.read_csv('your_cleaned_data.csv')  # Replace with actual path
+# Load data from the URL
+url = 'https://raw.githubusercontent.com/xyzhang09/BMI706_Project/main/Life_Expectancy_Data.csv'
+df = pd.read_csv(url)
 
-# Streamlit app setup
+# Function to map country names to ISO numeric country codes
+def get_numeric_country_code(name):
+    try:
+        return pycountry.countries.lookup(name).numeric
+    except LookupError:
+        return None
+
+# Apply the function to map country names to ISO numeric country codes
+df['country-code'] = df['Country'].apply(get_numeric_country_code)
+
+# Check for countries that couldn't be matched
+missing_codes = df[df['country-code'].isna()]['Country'].unique()
+if len(missing_codes) > 0:
+    st.write("Countries that couldn't be matched with ISO numeric codes:", missing_codes)
+
+# Streamlit app title
 st.title("Life Expectancy Comparison Dashboard")
 
 # User input: Select year
@@ -16,10 +33,10 @@ year = st.slider('Select Year', int(df['Year'].min()), int(df['Year'].max()), 20
 factor = st.selectbox('Select a factor to compare with Life Expectancy', 
                       ['Adult Mortality', 'Population', 'GDP', 'infant deaths', 'Alcohol'])
 
-# Filter data for the selected year
+# Filter the data for the selected year
 df2 = df[df['Year'] == year]
 
-# Define the geographic background
+# Load the world topojson data
 source = alt.topo_feature(data.world_110m.url, 'countries')
 
 # Map configuration
@@ -28,8 +45,7 @@ height = 300
 project = 'equirectangular'
 
 # Background map
-background = alt.Chart(source
-).mark_geoshape(
+background = alt.Chart(source).mark_geoshape(
     fill='#aaa',
     stroke='white'
 ).properties(
@@ -37,7 +53,7 @@ background = alt.Chart(source
     height=height
 ).project(project)
 
-# Selector for interaction
+# Selector for interactivity
 selector = alt.selection_single(
     fields=['Country'],
     on='click'
