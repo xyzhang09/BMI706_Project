@@ -1,3 +1,8 @@
+import subprocess
+subprocess.run(["pip", "install", "vega_datasets"])
+
+from vega_datasets import data
+
 import streamlit as st
 import pandas as pd
 import altair as alt
