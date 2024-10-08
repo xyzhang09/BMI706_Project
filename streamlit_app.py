@@ -8,6 +8,9 @@ from vega_datasets import data
 url = 'https://raw.githubusercontent.com/xyzhang09/BMI706_Project/main/Life_Expectancy_Data.csv'
 df = pd.read_csv(url)
 
+import subprocess
+subprocess.run(["pip", "install", "pycountry"])
+
 # Function to map country names to ISO numeric country codes
 def get_numeric_country_code(name):
     try:
